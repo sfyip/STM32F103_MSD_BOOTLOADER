@@ -17,6 +17,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <stdbool.h>
 
 bool fat32_read(uint8_t *b, uint32_t addr);
-bool fat32_write(uint8_t *b, uint32_t addr);
+bool fat32_write(const uint8_t *b, uint32_t addr);
 
 #endif

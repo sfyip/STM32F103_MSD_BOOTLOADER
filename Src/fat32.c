@@ -286,7 +286,7 @@ static void _fat32_read_firmware(uint8_t *b, uint32_t addr)
 #endif
 }
 
-static bool _fat32_write_firmware(uint8_t *b, uint32_t addr)
+static bool _fat32_write_firmware(const uint8_t *b, uint32_t addr)
 {
     bool return_status = false;
   
@@ -384,7 +384,7 @@ bool fat32_read(uint8_t *b, uint32_t addr)
     return true;
 }
 
-bool fat32_write(uint8_t *b, uint32_t addr)
+bool fat32_write(const uint8_t *b, uint32_t addr)
 {
     if(addr & (FAT32_SECTOR_SIZE - 1))      // if not align ?
     {
