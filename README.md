@@ -3,10 +3,12 @@ STM32F103 Mass Storage Device Bootloader
 
 Device: STM32F103C8T6 (Flash size: 128KB )
 
+My example:
 | Name | Address |
 | --- | --- |
 | Appcode start from: | 0x0800_8000 - 0x0801_9999  (96KB) |
-| Bootloader start from: | 0x0800_0000 - 0x8000_7FFF (32KB)|
+| (Unused) start from: | 0x0800_3000 - 0x0800_7FFF (20KB)|
+| Bootloader start from: | 0x0800_0000 - 0x0800_2FFF (12KB)|
 
 Simulate a USB removable disk (FAT32).
 The content of firmware.bin is mapped to Appcode area. Hence, the size of firmware.bin is also 96KB.
