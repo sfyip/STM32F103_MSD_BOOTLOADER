@@ -40,11 +40,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 //-------------------------------------------------------
 
-#define FAT32_FW_ADDR_BEGIN         0x00400600
-#define FAT32_FW_ADDR_END           (FAT32_FW_ADDR_BEGIN + APP_SIZE)
-
-//-------------------------------------------------------
-
 typedef __packed struct 
 {
     uint8_t BS_jmpBoot[3];
@@ -106,6 +101,17 @@ typedef __packed struct
     uint32_t DIR_FileSize;
 }fat32_dir_entry_t;
 
+//-------------------------------------------------------
+
+typedef struct
+{
+    uint32_t begin;
+    uint32_t end;
+}fat32_range_t;
+
+#define FAT32_DIR_ENTRY_ADDR         0x00400000
+
+static fat32_range_t fw_addr_range = {0x00400600, (0x00400600 + APP_SIZE)};
 
 //-------------------------------------------------------
 
@@ -276,7 +282,7 @@ static void _fat32_read_dir_entry(uint8_t *b)
 static void _fat32_read_firmware(uint8_t *b, uint32_t addr)
 {
 #if (CONFIG_READ_FLASH > 0u)
-    uint32_t offset = addr - FAT32_FW_ADDR_BEGIN;
+    uint32_t offset = addr - fw_addr_range.begin;
     uint32_t addr_end = MIN(offset + FAT32_SECTOR_SIZE, APP_SIZE);
     int32_t total_size = addr_end - offset;
     
@@ -288,19 +294,22 @@ static void _fat32_read_firmware(uint8_t *b, uint32_t addr)
 
 static bool _fat32_write_firmware(const uint8_t *b, uint32_t addr)
 {
-    bool return_status = false;
+    bool return_status = true;
   
     HAL_StatusTypeDef status;
     
     HAL_FLASH_Unlock();
     
-    uint32_t offset = addr - FAT32_FW_ADDR_BEGIN;
+    uint32_t offset = addr - fw_addr_range.begin;
     uint32_t phy_addr = APP_ADDR + offset;
-    uint32_t addr_end = MIN(offset + FAT32_SECTOR_SIZE, APP_SIZE);
-    uint32_t prog_size = addr_end - offset;
-    uint32_t i;
+    uint32_t prog_size = MIN(FAT32_SECTOR_SIZE, fw_addr_range.end - fw_addr_range.begin);
   
-    if(addr == FAT32_FW_ADDR_BEGIN)
+    if(prog_size & 0x03)
+    {
+        prog_size += 4;
+    }
+  
+    if(addr == fw_addr_range.begin)
     {
         // Erase the APPCODE area
         uint32_t PageError = 0;
@@ -313,6 +322,7 @@ static bool _fat32_write_firmware(const uint8_t *b, uint32_t addr)
         
         if(status != HAL_OK)
         {
+            return_status = false;
             goto EXIT;
         }
     }
@@ -320,22 +330,25 @@ static bool _fat32_write_firmware(const uint8_t *b, uint32_t addr)
     
     if((phy_addr >= APP_ADDR) && (phy_addr < (APP_ADDR + APP_SIZE)) )
     {
+        uint32_t i = 0;
+      
         for(i=0; i<prog_size; i+=4)
         {
             const uint8_t *wbuf = b + i;
             status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, phy_addr + i, *((uint32_t*)wbuf));
             if(status != HAL_OK)
             {
-              goto EXIT;
+                return_status = false;
+                goto EXIT;
             }
         }
     }
     
-    if(addr == (FAT32_FW_ADDR_END - FAT32_SECTOR_SIZE))
-    {
+    //if(addr == (fw_addr_range.end - FAT32_SECTOR_SIZE))
+    //{
       // DownloadComplete();
-      return_status = true;
-    }
+    //  return_status = true;
+    //}
 EXIT:
     HAL_FLASH_Lock();
     return return_status;
@@ -368,11 +381,11 @@ bool fat32_read(uint8_t *b, uint32_t addr)
     {
         _fat32_read_fat_table(b, addr);
     }
-    else if(addr == 0x00400000)
+    else if(addr == FAT32_DIR_ENTRY_ADDR)
     {
         _fat32_read_dir_entry(b);
     }
-    else if(addr >= FAT32_FW_ADDR_BEGIN && addr < FAT32_FW_ADDR_END)
+    else if(addr >= fw_addr_range.begin && addr < fw_addr_range.end)
     {
         _fat32_read_firmware(b, addr);
     }
@@ -391,12 +404,39 @@ bool fat32_write(const uint8_t *b, uint32_t addr)
         return false;
     }
     
-    if(addr >= FAT32_FW_ADDR_BEGIN && addr < FAT32_FW_ADDR_END)
+    uint32_t align_addr_end = (fw_addr_range.end & ~(FAT32_SECTOR_SIZE-1)) + ((fw_addr_range.end & (FAT32_SECTOR_SIZE-1)) ? FAT32_SECTOR_SIZE : 0);
+    
+    if(addr < FAT32_DIR_ENTRY_ADDR)
+    {
+      // No operation
+    }
+    else if(addr == FAT32_DIR_ENTRY_ADDR)
+    {
+        uint32_t i;
+        for(i=0; i<FAT32_SECTOR_SIZE; i+= sizeof(fat32_dir_entry_t))
+        {
+            const uint8_t *b_offset = (const uint8_t *)(b + i);
+            fat32_dir_entry_t *entry = (fat32_dir_entry_t*)b_offset;
+             
+            if(memcmp((void*) &entry->DIR_Name[8], "BIN", 3) == 0)
+            {
+                uint32_t clus = (((uint32_t)(entry->DIR_FstClusHI)) << 16) | entry->DIR_FstClusLO;
+              
+                fw_addr_range.begin = ((clus-2) + 0x2000 ) * FAT32_SECTOR_SIZE;
+                fw_addr_range.end = fw_addr_range.begin + MIN(entry->DIR_FileSize, APP_SIZE);
+            }
+        }
+    }
+    else if(addr >= fw_addr_range.begin && addr < align_addr_end)
     {
         if(!_fat32_write_firmware(b, addr))
         {
             return false;
         }
+    }
+    else
+    {
+        volatile uint8_t halt = 1;
     }
     
     return true;
