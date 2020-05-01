@@ -15,7 +15,7 @@ The content of firmware.bin is mapped to Appcode area. Hence, the size of firmwa
 
 Update Appcode Procedure:
 1. Convert the iHex file to bin file
-2. Drag and drop the firmware file to update the appcode.
+2. Drag and drop the bin file to update the appcode
 
 Only tested on Windows 8.<br />
 ***MacOSX doesn't work properly***
