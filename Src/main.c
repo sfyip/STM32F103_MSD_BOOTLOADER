@@ -91,12 +91,13 @@ bool is_appcode_exist()
 void jmp_to_appcode()
 {
   /* Function pointer to the address of the user application. */
-  
+  uint32_t jump_addr = *((__IO uint32_t*)(APP_ADDR+4u));
   HAL_DeInit();
   /* Change the main stack pointer. */
-  __set_MSP(*(volatile uint32_t*)APP_ADDR);
+  __set_MSP(*(__IO uint32_t*)APP_ADDR);
   SCB->VTOR = APP_ADDR;
-  ((void (*) (void)) (APP_ADDR+4u)) ();
+  
+  ((void (*) (void)) (jump_addr)) ();
 }
 
 bool is_button_down()
