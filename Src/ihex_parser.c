@@ -19,15 +19,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "stm32f1xx_hal.h"
-#include "btldr_config.h"
 #include "ihex_parser.h"
-
-
-#if (CONFIG_IHEX_DEBUG_OUTPUT > 0u)
-    #include <stdio.h>
-#endif
-
 
 //IHEX file parser state machine
 #define START_CODE_STATE        0
@@ -77,51 +69,6 @@ static ihex_callback_fp callback_fp = 0;
                                                 ( (((uint32_t)(addr_hi)) << 4) + ((uint32_t)(addr_lo)) ): \
                                                 ( (((uint32_t)(addr_hi)) << 16) | ((uint32_t)(addr_lo)) )
 
-#if (CONFIG_IHEX_DEBUG_OUTPUT > 0u)
-static void ihex_debug_output()
-{
-    switch (record_type)
-    {
-    case 0:         //DATA
-    {
-        uint32_t address = TRANSFORM_ADDR(address_hi, address_lo);
-        printf("WriteData (0x%08X):", address);
-
-        uint8_t i;
-        uint8_t data_size = data_size_in_nibble >> 1;
-        for (i = 0; i < data_size; i++)
-        {
-            printf("%02X", data[i]);
-        }
-        printf("\n");
-        break;
-    }
-
-    case 1:         //EOF
-        printf("EOF\n");
-        break;
-
-    case 2:         //Set extended segment address
-        printf("Set Extended Segment Address:%08X\n", TRANSFORM_ADDR(address_hi, 0x0000));
-        break;
-
-    case 3:         // Start extended segment address
-        printf("Start extended segment address\n");
-        break;
-
-    case 4:         //Set linear address
-        printf("Set Linear Address:%08X\n", TRANSFORM_ADDR(address_hi, 0x0000));
-        break;
-
-    case 5:         // Start linear address
-        printf("Start linear address\n");
-        break;
-
-    default:
-        break;
-    }
-}
-#endif
 
 void ihex_reset_state()
 {
@@ -281,10 +228,6 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
                 ex_segment_addr_mode = false;
             }
 
-#if (CONFIG_IHEX_DEBUG_OUTPUT > 0u)
-            ihex_debug_output();
-#endif
-
             if (record_type == 0 && callback_fp != 0)
             {
                 uint32_t address = TRANSFORM_ADDR(address_hi, address_lo);
@@ -293,10 +236,12 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
                     return false;
                 }
             }
+#if (CONFIG_SOFT_RESET_AFTER_IHEX_EOF > 0u)
             else if(record_type == 1)
             {
                 NVIC_SystemReset();
             }
+#endif
 
             state = START_CODE_STATE;
             break;

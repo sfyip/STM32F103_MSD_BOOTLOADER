@@ -20,6 +20,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #define APP_ADDR                (DEV_CODE_ADDR + 0x4000)
 #define APP_SIZE                (DEV_FLASH_SIZE - 0x4000)
 
-#define CONFIG_READ_FLASH       1u
+#define CONFIG_READ_FLASH                   1u
+#define CONFIG_SOFT_RESET_AFTER_IHEX_EOF    1u
 
 #endif
