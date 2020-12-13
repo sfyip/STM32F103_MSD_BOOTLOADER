@@ -15,13 +15,14 @@ The content of firmware.bin is mapped to Appcode area. Hence, the size of firmwa
 
 Just drag and drop the intel hex file to update the appcode. The bootloader will automatically restart if EOF RecordType is found in the hex file.
 
-Only tested on Windows 8 and MacOS Sierra<br />
-
 During power up, the bootloader will check the content of 0x0800_4000 exists or not.
 Hold PA0 (Connect to GND) during power up can force to enter bootloader mode.
 
-Several examples are provided in "example-hex" to validate the bootloader feature.
-####Test Procedure:
+#### Only tested on Windows 8 and MacOS Sierra<br />
+
+Several examples are provided in "example-hex" folder to validate the bootloader feature.
+
+#### Test Procedure:
 1. Hold PA0 during power up to enter bootloader mode.
 2. A removable disk drive named "BOOTLOADER" is recognized.
 3. Ensure PA0 is released.
