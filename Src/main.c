@@ -102,7 +102,7 @@ void jmp_to_appcode()
 
 bool is_button_down()
 {
-  return (HAL_GPIO_ReadPin(BTLDR_EN_GPIO_Port, BTLDR_EN_Pin) == GPIO_PIN_RESET);
+    return (!LL_GPIO_IsInputPinSet(BTLDR_EN_GPIO_Port, BTLDR_EN_Pin) );
 }
 
 /* USER CODE END 0 */

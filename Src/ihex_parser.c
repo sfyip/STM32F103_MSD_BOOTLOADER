@@ -15,10 +15,14 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TOR
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 **************************************************************************************/
 
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include "stm32f1xx_hal.h"
+#include "btldr_config.h"
 #include "ihex_parser.h"
+
 
 #if (CONFIG_IHEX_DEBUG_OUTPUT > 0u)
     #include <stdio.h>
@@ -288,6 +292,10 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
                 {
                     return false;
                 }
+            }
+            else if(record_type == 1)
+            {
+                NVIC_SystemReset();
             }
 
             state = START_CODE_STATE;

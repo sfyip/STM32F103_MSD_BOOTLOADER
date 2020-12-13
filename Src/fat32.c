@@ -293,7 +293,7 @@ static void _fat32_read_firmware(uint8_t *b, uint32_t addr)
 #endif
 }
 
-static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint32_t size)
+static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint8_t size)
 {
     bool return_status = true;
   
@@ -306,7 +306,7 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint32_
         size += 4;
     }
   
-    if(phy_addr == fw_addr_range.begin)
+    if(phy_addr == APP_ADDR)
     {
         // Erase the APPCODE area
         uint32_t PageError = 0;
@@ -341,11 +341,6 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint32_
         }
     }
     
-    //if(addr == (fw_addr_range.end - FAT32_SECTOR_SIZE))
-    //{
-    //  DownloadComplete();
-    //  return_status = true;
-    //}
 EXIT:
     HAL_FLASH_Lock();
     return return_status;
@@ -429,7 +424,7 @@ bool fat32_write(const uint8_t *b, uint32_t addr)
     }
     else if(addr >= fw_addr_range.begin)
     {
-        ihex_set_callback_func((ihex_callback_fp)_fat32_write_firmware);
+        ihex_set_callback_func(_fat32_write_firmware);
         
         ihex_parser(b, FAT32_SECTOR_SIZE);
     }

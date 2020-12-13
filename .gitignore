@@ -1,0 +1,10 @@
+
+*.dbgconf
+*.lst
+*.crf
+*.d
+*.o
+*.sct
+*.dep
+*.htm
+*.lnp
