@@ -57,7 +57,7 @@ static uint16_t address_hi;
 static bool ex_segment_addr_mode = false;
 static uint8_t record_type;
 static uint8_t data[IHEX_DATA_SIZE];
-static uint8_t data_size_in_nibble;
+static uint16_t data_size_in_nibble;
 
 static uint8_t temp_cs;         // save checksum high byte
 static uint8_t calc_cs;         // calculate checksum
