@@ -314,7 +314,7 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint32_
         
         eraseinitstruct.TypeErase = FLASH_TYPEERASE_PAGES;
         eraseinitstruct.PageAddress = APP_ADDR;
-        eraseinitstruct.NbPages = APP_SIZE / DEV_ERASE_PAGE_SIZE;
+        eraseinitstruct.NbPages = APP_SIZE / FLASH_PAGE_SIZE;
         status = HAL_FLASHEx_Erase(&eraseinitstruct, &PageError);
         
         if(status != HAL_OK)
