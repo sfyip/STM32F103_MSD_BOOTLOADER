@@ -16,6 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "stm32f1xx_hal.h"
 #include "btldr_config.h"
 #include "fat32.h"
+#include "ihex_parser.h"
 
 //-------------------------------------------------------
 
@@ -109,9 +110,16 @@ typedef struct
     uint32_t end;
 }fat32_range_t;
 
+typedef enum
+{
+    BIN_FILE,
+    HEX_FILE
+}fat32_wr_file_type;
+
 #define FAT32_DIR_ENTRY_ADDR         0x00400000
 
 static fat32_range_t fw_addr_range = {0x00400600, (0x00400600 + APP_SIZE)};
+static fat32_wr_file_type wr_file_type = HEX_FILE;
 
 //-------------------------------------------------------
 
@@ -253,9 +261,9 @@ static void _fat32_read_dir_entry(uint8_t *b)
     dir->DIR_Attr = FAT32_ATTR_VOLUME_ID;
     dir->DIR_NTRes = 0x00;
     dir->DIR_CrtTimeTenth = 0x00;
-    dir->DIR_CrtTime = 0x0000;
-    dir->DIR_CrtDate = 0x0000;
-    dir->DIR_LstAccDate = 0x0000;
+    dir->DIR_CrtTime = FAT32_MAKE_TIME(0,0);
+    dir->DIR_CrtDate = FAT32_MAKE_DATE(28,04,2020);
+    dir->DIR_LstAccDate = FAT32_MAKE_DATE(28,04,2020);
     dir->DIR_FstClusHI = 0x0000;
     dir->DIR_WrtTime = FAT32_MAKE_TIME(0,0);
     dir->DIR_WrtDate = FAT32_MAKE_DATE(28,04,2020);
@@ -292,7 +300,7 @@ static void _fat32_read_firmware(uint8_t *b, uint32_t addr)
 #endif
 }
 
-static bool _fat32_write_firmware(const uint8_t *b, uint32_t addr)
+static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *flashRawData, uint32_t size)
 {
     bool return_status = true;
   
@@ -300,16 +308,12 @@ static bool _fat32_write_firmware(const uint8_t *b, uint32_t addr)
     
     HAL_FLASH_Unlock();
     
-    uint32_t offset = addr - fw_addr_range.begin;
-    uint32_t phy_addr = APP_ADDR + offset;
-    uint32_t prog_size = MIN(FAT32_SECTOR_SIZE, fw_addr_range.end - fw_addr_range.begin);
-  
-    if(prog_size & 0x03)
+    if(size & 0x03)
     {
-        prog_size += 4;
+        size += 4;
     }
   
-    if(addr == fw_addr_range.begin)
+    if(phy_addr == fw_addr_range.begin)
     {
         // Erase the APPCODE area
         uint32_t PageError = 0;
@@ -327,15 +331,15 @@ static bool _fat32_write_firmware(const uint8_t *b, uint32_t addr)
         }
     }
     
-    
     if((phy_addr >= APP_ADDR) && (phy_addr < (APP_ADDR + APP_SIZE)) )
     {
         uint32_t i = 0;
       
-        for(i=0; i<prog_size; i+=4)
+        for(i=0; i<size; i+=4)
         {
-            const uint8_t *wbuf = b + i;
+            const uint8_t *wbuf = flashRawData + i;
             status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, phy_addr + i, *((uint32_t*)wbuf));
+
             if(status != HAL_OK)
             {
                 return_status = false;
@@ -346,13 +350,14 @@ static bool _fat32_write_firmware(const uint8_t *b, uint32_t addr)
     
     //if(addr == (fw_addr_range.end - FAT32_SECTOR_SIZE))
     //{
-      // DownloadComplete();
+    //  DownloadComplete();
     //  return_status = true;
     //}
 EXIT:
     HAL_FLASH_Lock();
     return return_status;
 }
+
 
 //-------------------------------------------------------
 
@@ -420,18 +425,44 @@ bool fat32_write(const uint8_t *b, uint32_t addr)
              
             if(memcmp((void*) &entry->DIR_Name[8], "BIN", 3) == 0)
             {
+                wr_file_type = BIN_FILE;
+                
                 uint32_t clus = (((uint32_t)(entry->DIR_FstClusHI)) << 16) | entry->DIR_FstClusLO;
               
                 fw_addr_range.begin = ((clus-2) + 0x2000 ) * FAT32_SECTOR_SIZE;
                 fw_addr_range.end = fw_addr_range.begin + MIN(entry->DIR_FileSize, APP_SIZE);
             }
+            else if(memcmp((void*) &entry->DIR_Name[8], "HEX", 3) == 0)
+            {
+                wr_file_type = HEX_FILE;
+                
+                uint32_t clus = (((uint32_t)(entry->DIR_FstClusHI)) << 16) | entry->DIR_FstClusLO;
+              
+                fw_addr_range.begin = ((clus-2) + 0x2000 ) * FAT32_SECTOR_SIZE;
+                fw_addr_range.end = fw_addr_range.begin + entry->DIR_FileSize;       // don't know the size of HEX file
+            }
         }
     }
     else if(addr >= fw_addr_range.begin && addr < align_addr_end)
     {
-        if(!_fat32_write_firmware(b, addr))
+        if(wr_file_type == BIN_FILE)
         {
-            return false;
+            uint32_t offset = (addr - fw_addr_range.begin);
+            uint32_t phy_addr = APP_ADDR + offset;
+            uint32_t prog_size = MIN(FAT32_SECTOR_SIZE, fw_addr_range.end - fw_addr_range.begin);
+            if(!_fat32_write_firmware(phy_addr, b, prog_size))
+            {
+                return false;
+            }
+        }
+        else if(wr_file_type == HEX_FILE)
+        {
+            ihex_set_callback_func((ihex_callback_fp)_fat32_write_firmware);
+            ihex_reset_state();
+            if(!ihex_parser(b, FAT32_SECTOR_SIZE))
+            {
+                return false;
+            }
         }
     }
     else
