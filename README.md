@@ -14,9 +14,10 @@ Simulate a USB removable disk (FAT32).
 The content of firmware.bin is mapped to Appcode area. Hence, the size of firmware.bin is also 112KB.
 
 Just drag and drop the intel hex file to update the appcode. The bootloader will automatically restart if EOF RecordType is found in the hex file.
-<b>Drag and drop the BIN file is removed.</b> Since intel hex file has the following advantages over the bin file: </b>
-1. provides better integrity check</b>
-2. macOS works properly because of unique format in ihex file </b>
+<b>Drag and drop the BIN file is removed.</b> Since intel hex file has the following advantages over the bin file:
+1. Most of the compiler tools support direct export to intel hex file. No need to covert to bin file anymore
+2. provides better integrity check
+3. macOS works properly because of unique format in ihex file
 
 During power up, the bootloader will check the content of 0x0800_4000 exists or not.
 Hold PA0 (Connect to GND) during power up can force to enter bootloader mode.
