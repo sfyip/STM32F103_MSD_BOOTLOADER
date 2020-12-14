@@ -110,6 +110,14 @@ typedef struct
     uint32_t end;
 }fat32_range_t;
 
+typedef union
+{
+  uint8_t buf[4];
+  uint32_t value32;
+}uint32x_t;               // used for flash align write
+
+//-------------------------------------------------------
+
 #define FAT32_DIR_ENTRY_ADDR         0x00400000
 
 static fat32_range_t fw_addr_range = {0x00400600, (0x00400600 + APP_SIZE)};
@@ -301,11 +309,6 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint8_t
     
     HAL_FLASH_Unlock();
     
-    if(size & 0x03)
-    {
-        size += 4;
-    }
-  
     if(phy_addr == APP_ADDR)
     {
         // Erase the APPCODE area
@@ -323,21 +326,58 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint8_t
             goto EXIT;
         }
     }
-    
-    if((phy_addr >= APP_ADDR) && (phy_addr < (APP_ADDR + APP_SIZE)) )
-    {
-        uint32_t i = 0;
       
-        for(i=0; i<size; i+=4)
+    if((phy_addr >= APP_ADDR) && ((phy_addr+size) <= (APP_ADDR + APP_SIZE)) )
+    {
+        uint8_t unalign = phy_addr & 0x03;    // support unalign write
+        uint32x_t content;
+      
+        if(unalign)
         {
-            const uint8_t *wbuf = buf + i;
-            status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, phy_addr + i, *((uint32_t*)wbuf));
-
-            if(status != HAL_OK)
+            uint32_t prog_addr = phy_addr & ~(0x03);
+            uint8_t prog_size = MIN(size, 4-unalign);
+            
+            content.buf[0] = 0xFF;
+            content.buf[1] = 0xFF;
+            content.buf[2] = 0xFF;
+            content.buf[3] = 0xFF;
+        
+            uint8_t i;
+            for(i=0; i<prog_size; i++)
             {
-                return_status = false;
-                goto EXIT;
+                content.buf[i+unalign] = *buf++;
+                phy_addr++;
+                --size;
             }
+            HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, prog_addr, content.value32);
+        }
+      
+        while(size >= 4)
+        {
+            content.buf[0] = buf[0];
+            content.buf[1] = buf[1];
+            content.buf[2] = buf[2];
+            content.buf[3] = buf[3];
+            
+            HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, phy_addr, content.value32);
+            phy_addr += 4;
+            buf += 4;
+            size -= 4;
+        }
+        
+        if(size)  // write remaining byte
+        {
+            content.buf[0] = 0xFF;
+            content.buf[1] = 0xFF;
+            content.buf[2] = 0xFF;
+            content.buf[3] = 0xFF;
+            
+            uint8_t i;
+            for(i=0; i<size; i++)
+            {
+                content.buf[i] = *buf++;
+            }
+            HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, phy_addr, content.value32);
         }
     }
     

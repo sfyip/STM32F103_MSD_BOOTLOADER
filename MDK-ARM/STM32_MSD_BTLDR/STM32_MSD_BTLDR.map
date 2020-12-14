@@ -1045,22 +1045,22 @@ Image Symbol Table
     i._fat32_read_fat_table                  0x08002b0c   Section        0  fat32.o(i._fat32_read_fat_table)
     _fat32_read_fat_table                    0x08002b0d   Thumb Code   112  fat32.o(i._fat32_read_fat_table)
     i._fat32_write_firmware                  0x08002b84   Section        0  fat32.o(i._fat32_write_firmware)
-    _fat32_write_firmware                    0x08002b85   Thumb Code   110  fat32.o(i._fat32_write_firmware)
-    i.fat32_read                             0x08002bf8   Section        0  fat32.o(i.fat32_read)
-    i.fat32_write                            0x08002cec   Section        0  fat32.o(i.fat32_write)
-    i.ihex_parser                            0x08002d78   Section        0  ihex_parser.o(i.ihex_parser)
-    i.ihex_reset_state                       0x08002f28   Section        0  ihex_parser.o(i.ihex_reset_state)
-    i.ihex_set_callback_func                 0x08002f3c   Section        0  ihex_parser.o(i.ihex_set_callback_func)
-    i.is_appcode_exist                       0x08002f48   Section        0  main.o(i.is_appcode_exist)
-    i.is_button_down                         0x08002f78   Section        0  main.o(i.is_button_down)
-    i.jmp_to_appcode                         0x08002f8c   Section        0  main.o(i.jmp_to_appcode)
-    i.main                                   0x08002fb0   Section        0  main.o(i.main)
-    .constdata                               0x0800300c   Section       90  fat32.o(.constdata)
-    FAT32_MBR_DATA0                          0x0800300c   Data          90  fat32.o(.constdata)
-    .constdata                               0x08003066   Section       36  usbd_storage_if.o(.constdata)
-    .constdata                               0x0800308a   Section        7  usbd_msc_data.o(.constdata)
-    .constdata                               0x08003091   Section        8  usbd_msc_data.o(.constdata)
-    .constdata                               0x08003099   Section        8  usbd_msc_data.o(.constdata)
+    _fat32_write_firmware                    0x08002b85   Thumb Code   266  fat32.o(i._fat32_write_firmware)
+    i.fat32_read                             0x08002c98   Section        0  fat32.o(i.fat32_read)
+    i.fat32_write                            0x08002d8c   Section        0  fat32.o(i.fat32_write)
+    i.ihex_parser                            0x08002e18   Section        0  ihex_parser.o(i.ihex_parser)
+    i.ihex_reset_state                       0x08002fc8   Section        0  ihex_parser.o(i.ihex_reset_state)
+    i.ihex_set_callback_func                 0x08002fdc   Section        0  ihex_parser.o(i.ihex_set_callback_func)
+    i.is_appcode_exist                       0x08002fe8   Section        0  main.o(i.is_appcode_exist)
+    i.is_button_down                         0x08003018   Section        0  main.o(i.is_button_down)
+    i.jmp_to_appcode                         0x0800302c   Section        0  main.o(i.jmp_to_appcode)
+    i.main                                   0x08003050   Section        0  main.o(i.main)
+    .constdata                               0x080030ac   Section       90  fat32.o(.constdata)
+    FAT32_MBR_DATA0                          0x080030ac   Data          90  fat32.o(.constdata)
+    .constdata                               0x08003106   Section       36  usbd_storage_if.o(.constdata)
+    .constdata                               0x0800312a   Section        7  usbd_msc_data.o(.constdata)
+    .constdata                               0x08003131   Section        8  usbd_msc_data.o(.constdata)
+    .constdata                               0x08003139   Section        8  usbd_msc_data.o(.constdata)
     .data                                    0x20000000   Section        8  fat32.o(.data)
     fw_addr_range                            0x20000000   Data           8  fat32.o(.data)
     .data                                    0x20000008   Section       28  usbd_desc.o(.data)
@@ -1316,21 +1316,21 @@ Image Symbol Table
     __scatterload_copy                       0x08002a63   Thumb Code    14  handlers.o(i.__scatterload_copy)
     __scatterload_null                       0x08002a71   Thumb Code     2  handlers.o(i.__scatterload_null)
     __scatterload_zeroinit                   0x08002a73   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    fat32_read                               0x08002bf9   Thumb Code   210  fat32.o(i.fat32_read)
-    fat32_write                              0x08002ced   Thumb Code   132  fat32.o(i.fat32_write)
-    ihex_parser                              0x08002d79   Thumb Code   416  ihex_parser.o(i.ihex_parser)
-    ihex_reset_state                         0x08002f29   Thumb Code    14  ihex_parser.o(i.ihex_reset_state)
-    ihex_set_callback_func                   0x08002f3d   Thumb Code     6  ihex_parser.o(i.ihex_set_callback_func)
-    is_appcode_exist                         0x08002f49   Thumb Code    42  main.o(i.is_appcode_exist)
-    is_button_down                           0x08002f79   Thumb Code    14  main.o(i.is_button_down)
-    jmp_to_appcode                           0x08002f8d   Thumb Code    28  main.o(i.jmp_to_appcode)
-    main                                     0x08002fb1   Thumb Code    82  main.o(i.main)
-    STORAGE_Inquirydata_FS                   0x08003066   Data          36  usbd_storage_if.o(.constdata)
-    MSC_Page00_Inquiry_Data                  0x0800308a   Data           7  usbd_msc_data.o(.constdata)
-    MSC_Mode_Sense6_data                     0x08003091   Data           8  usbd_msc_data.o(.constdata)
-    MSC_Mode_Sense10_data                    0x08003099   Data           8  usbd_msc_data.o(.constdata)
-    Region$$Table$$Base                      0x080030a4   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x080030c4   Number         0  anon$$obj.o(Region$$Table)
+    fat32_read                               0x08002c99   Thumb Code   210  fat32.o(i.fat32_read)
+    fat32_write                              0x08002d8d   Thumb Code   132  fat32.o(i.fat32_write)
+    ihex_parser                              0x08002e19   Thumb Code   416  ihex_parser.o(i.ihex_parser)
+    ihex_reset_state                         0x08002fc9   Thumb Code    14  ihex_parser.o(i.ihex_reset_state)
+    ihex_set_callback_func                   0x08002fdd   Thumb Code     6  ihex_parser.o(i.ihex_set_callback_func)
+    is_appcode_exist                         0x08002fe9   Thumb Code    42  main.o(i.is_appcode_exist)
+    is_button_down                           0x08003019   Thumb Code    14  main.o(i.is_button_down)
+    jmp_to_appcode                           0x0800302d   Thumb Code    28  main.o(i.jmp_to_appcode)
+    main                                     0x08003051   Thumb Code    82  main.o(i.main)
+    STORAGE_Inquirydata_FS                   0x08003106   Data          36  usbd_storage_if.o(.constdata)
+    MSC_Page00_Inquiry_Data                  0x0800312a   Data           7  usbd_msc_data.o(.constdata)
+    MSC_Mode_Sense6_data                     0x08003131   Data           8  usbd_msc_data.o(.constdata)
+    MSC_Mode_Sense10_data                    0x08003139   Data           8  usbd_msc_data.o(.constdata)
+    Region$$Table$$Base                      0x08003144   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x08003164   Number         0  anon$$obj.o(Region$$Table)
     FS_Desc                                  0x20000008   Data          28  usbd_desc.o(.data)
     USBD_LangIDDesc                          0x20000024   Data           4  usbd_desc.o(.data)
     USBD_FS_DeviceDesc                       0x20000028   Data          18  usbd_desc.o(.data)
@@ -1359,9 +1359,9 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x00003208, Max: 0x00010000, ABSOLUTE, COMPRESSED[0x00003174])
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x000032a8, Max: 0x00010000, ABSOLUTE, COMPRESSED[0x00003214])
 
-    Execution Region ER_IROM1 (Base: 0x08000000, Size: 0x000030c4, Max: 0x00010000, ABSOLUTE)
+    Execution Region ER_IROM1 (Base: 0x08000000, Size: 0x00003164, Max: 0x00010000, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -1563,23 +1563,23 @@ Memory Map of the image
     0x08002a72   0x0000000e   Code   RO         3046    i.__scatterload_zeroinit  mc_w.l(handlers.o)
     0x08002a80   0x0000008c   Code   RO           13    i._fat32_read_dir_entry  fat32.o
     0x08002b0c   0x00000078   Code   RO           14    i._fat32_read_fat_table  fat32.o
-    0x08002b84   0x00000074   Code   RO           15    i._fat32_write_firmware  fat32.o
-    0x08002bf8   0x000000f4   Code   RO           16    i.fat32_read        fat32.o
-    0x08002cec   0x0000008c   Code   RO           17    i.fat32_write       fat32.o
-    0x08002d78   0x000001b0   Code   RO          782    i.ihex_parser       ihex_parser.o
-    0x08002f28   0x00000014   Code   RO          783    i.ihex_reset_state  ihex_parser.o
-    0x08002f3c   0x0000000c   Code   RO          784    i.ihex_set_callback_func  ihex_parser.o
-    0x08002f48   0x00000030   Code   RO          158    i.is_appcode_exist  main.o
-    0x08002f78   0x00000014   Code   RO          159    i.is_button_down    main.o
-    0x08002f8c   0x00000024   Code   RO          160    i.jmp_to_appcode    main.o
-    0x08002fb0   0x0000005c   Code   RO          161    i.main              main.o
-    0x0800300c   0x0000005a   Data   RO           18    .constdata          fat32.o
-    0x08003066   0x00000024   Data   RO          622    .constdata          usbd_storage_if.o
-    0x0800308a   0x00000007   Data   RO         2923    .constdata          usbd_msc_data.o
-    0x08003091   0x00000008   Data   RO         2924    .constdata          usbd_msc_data.o
-    0x08003099   0x00000008   Data   RO         2925    .constdata          usbd_msc_data.o
-    0x080030a1   0x00000003   PAD
-    0x080030a4   0x00000020   Data   RO         3042    Region$$Table       anon$$obj.o
+    0x08002b84   0x00000114   Code   RO           15    i._fat32_write_firmware  fat32.o
+    0x08002c98   0x000000f4   Code   RO           16    i.fat32_read        fat32.o
+    0x08002d8c   0x0000008c   Code   RO           17    i.fat32_write       fat32.o
+    0x08002e18   0x000001b0   Code   RO          782    i.ihex_parser       ihex_parser.o
+    0x08002fc8   0x00000014   Code   RO          783    i.ihex_reset_state  ihex_parser.o
+    0x08002fdc   0x0000000c   Code   RO          784    i.ihex_set_callback_func  ihex_parser.o
+    0x08002fe8   0x00000030   Code   RO          158    i.is_appcode_exist  main.o
+    0x08003018   0x00000014   Code   RO          159    i.is_button_down    main.o
+    0x0800302c   0x00000024   Code   RO          160    i.jmp_to_appcode    main.o
+    0x08003050   0x0000005c   Code   RO          161    i.main              main.o
+    0x080030ac   0x0000005a   Data   RO           18    .constdata          fat32.o
+    0x08003106   0x00000024   Data   RO          622    .constdata          usbd_storage_if.o
+    0x0800312a   0x00000007   Data   RO         2923    .constdata          usbd_msc_data.o
+    0x08003131   0x00000008   Data   RO         2924    .constdata          usbd_msc_data.o
+    0x08003139   0x00000008   Data   RO         2925    .constdata          usbd_msc_data.o
+    0x08003141   0x00000003   PAD
+    0x08003144   0x00000020   Data   RO         3042    Region$$Table       anon$$obj.o
 
 
     Execution Region RW_IRAM1 (Base: 0x20000000, Size: 0x00001158, Max: 0x00005000, ABSOLUTE, COMPRESSED[0x000000b0])
@@ -1615,7 +1615,7 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       760         82         90          8          0     381215   fat32.o
+       920         86         90          8          0     381607   fat32.o
        464         40          0         20        255      25733   ihex_parser.o
        378         44          0          0          0      34301   main.o
         36          8        236          0       1024        804   startup_stm32f103xb.o
@@ -1644,7 +1644,7 @@ Image component sizes
        120          0         36         32          0       4799   usbd_storage_if.o
 
     ----------------------------------------------------------------------
-     11788        542        420        324       4116     605867   Object Totals
+     11948        546        420        324       4116     606259   Object Totals
          0          0         32          0          0          0   (incl. Generated)
         26          0          3          7          1          0   (incl. Padding)
 
@@ -1687,15 +1687,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     12064        558        420        324       4116     597467   Grand Totals
-     12064        558        420        176       4116     597467   ELF Image Totals (compressed)
-     12064        558        420        176          0          0   ROM Totals
+     12224        562        420        324       4116     597859   Grand Totals
+     12224        562        420        176       4116     597859   ELF Image Totals (compressed)
+     12224        562        420        176          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                12484 (  12.19kB)
+    Total RO  Size (Code + RO Data)                12644 (  12.35kB)
     Total RW  Size (RW Data + ZI Data)              4440 (   4.34kB)
-    Total ROM Size (Code + RO Data + RW Data)      12660 (  12.36kB)
+    Total ROM Size (Code + RO Data + RW Data)      12820 (  12.52kB)
 
 ==============================================================================
 
