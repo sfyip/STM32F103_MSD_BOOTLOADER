@@ -7,8 +7,8 @@ My example:
 | Name | Address |
 | --- | --- |
 | Appcode starts from: | 0x0800_4000 - 0x0801_FFFF  (112KB) |
-| (Unused) starts from: | 0x0800_3170 - 0x0800_3FFF (3.64KB)|
-| Bootloader starts from: | 0x0800_0000 - 0x0800_316F (12.36KB)|
+| (Unused) starts from: | 0x0800_3220 - 0x0800_3FFF (3.47KB)|
+| Bootloader starts from: | 0x0800_0000 - 0x0800_321F (12.53KB)|
 
 Simulate a USB removable disk (FAT32).
 The content of firmware.bin is mapped to Appcode area. Hence, the size of firmware.bin is also 112KB.
@@ -31,5 +31,5 @@ Several examples are provided in "example-hex" folder to validate the bootloader
 2. A removable disk drive named "BOOTLOADER" is recognized.
 3. Ensure PA0 is released.
 4. Drag and drop STM32F103_FlashPC13LED_FAST.hex to the removable disk.
-5. Since the iHex file contains EOF record type, the bootloader will be self-reset.
+5. Since the intel hex file contains EOF record type, the bootloader will be self-reset.
 6. The bootloader jumps to Appcode. LED (PC13) blinks. 
