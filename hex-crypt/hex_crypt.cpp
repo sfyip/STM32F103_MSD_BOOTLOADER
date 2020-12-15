@@ -21,16 +21,14 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #include <map>
 #include <vector>
 
-#ifdef _MSC_VER
+
 extern "C" {
-#endif
 
 #include "ihex_parser.h"
 #include "crypt.h"
 
-#ifdef _MSC_VER
 }
-#endif
+
 
 #define CONFIG_DEBUG_OUTPUT        0u
 
