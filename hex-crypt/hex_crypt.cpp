@@ -241,7 +241,7 @@ void show_help()
     printf("Crypt utility for STM32 MSD bootloader @ 2020\n\n");
     printf("Orginial author: https://github.com/sfyip\n");
     printf("Released under MIT License. Anyone is free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so\n\n");
-    printf("Usage: crypt_hex.exe -o dest.hex -i src.hex\n");
+    printf("Usage: hex_crypt -o dest.hex -i src.hex\n");
 }
 
 int main(int argc, char *argv[])
