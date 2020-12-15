@@ -1,5 +1,4 @@
-# STM32F103_MSD_BOOTLOADER HEX Crypt utility
-Encrypt HEX file utility
+# STM32F103_MSD_BOOTLOADER HEX Crypt Utility
 
 Usage: hex_crypt -o dest.hex -i src.hex
 
