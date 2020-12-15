@@ -33,3 +33,6 @@ Several examples are provided in "example-hex" folder to validate the bootloader
 4. Drag and drop STM32F103_FlashPC13LED_FAST.hex to the removable disk.
 5. Since the intel hex file contains EOF record type, the bootloader will be self-reset.
 6. The bootloader jumps to Appcode. LED (PC13) blinks. 
+
+#### Added AES256-CTR Encryption:
+For more detail, please see the hex-crypt folder.
