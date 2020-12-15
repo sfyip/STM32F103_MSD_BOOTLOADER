@@ -467,6 +467,16 @@
               <FileType>1</FileType>
               <FilePath>..\Src\ihex_parser.c</FilePath>
             </File>
+            <File>
+              <FileName>aes_ctr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\aes_ctr.c</FilePath>
+            </File>
+            <File>
+              <FileName>crypt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\crypt.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

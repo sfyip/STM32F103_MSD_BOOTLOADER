@@ -17,6 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "btldr_config.h"
 #include "fat32.h"
 #include "ihex_parser.h"
+#include "crypt.h"
 
 //-------------------------------------------------------
 
@@ -303,9 +304,21 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint8_t
     HAL_FLASH_Unlock();
     
 #if (CONFIG_SUPPORT_CRYPT_MODE > 0u)
+    uint8_t decrypt_buf[AES_BLOCK_SIZE];
+  
     if(ihex_is_crypt_mode())
     {
-      //
+      if(size != AES_BLOCK_SIZE)
+      {
+          return false;
+      }
+      
+      uint8_t i;
+      for(i=0; i<size; i+= AES_BLOCK_SIZE)
+      {
+          decrypt(decrypt_buf, buf, size, phy_addr);
+          buf = decrypt_buf;
+      }
     }
 #endif
     
