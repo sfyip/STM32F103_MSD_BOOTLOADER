@@ -21,6 +21,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #include <string.h>
 #include "ihex_parser.h"
 
+//-------------------------------------------------------
+
 //IHEX file parser state machine
 #define START_CODE_STATE        0
 #define BYTE_COUNT_0_STATE      1
@@ -35,8 +37,22 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL
 #define CHECKSUM_0_STATE        10
 #define CHECKSUM_1_STATE        11
 
+//-------------------------------------------------------
+
+#define RECORD_TYPE_DATA            0x00
+#define RECORD_TYPE_EOF             0x01
+#define RECORD_TYPE_EX_SEG_ADDR     0x02
+#define RECORD_TYPE_START_SEG_ADDR  0x03
+#define RECORD_TYPE_EX_LIN_ADDR     0x04
+#define RECORD_TYPE_START_LIN_ADDR  0x05
+#define RECORD_TYPE_CRYPT_MODE      0x0E
+
+//-------------------------------------------------------
+
 #define INVALID_HEX_CHAR        'x'
 #define IHEX_DATA_SIZE          255
+
+//-------------------------------------------------------
 
 static uint8_t HexToDec(uint8_t h)
 {
@@ -64,6 +80,7 @@ static uint8_t calc_cs;         // calculate checksum
 static bool calc_cs_toogle = false;
 
 static ihex_callback_fp callback_fp = 0;
+static bool crypt_mode = false;     // extend the intex hex file format to support encryption
 
 #define TRANSFORM_ADDR(addr_hi, addr_lo)       (ex_segment_addr_mode) ?                                  \
                                                 ( (((uint32_t)(addr_hi)) << 4) + ((uint32_t)(addr_lo)) ): \
@@ -76,11 +93,17 @@ void ihex_reset_state()
     address_lo = 0;
     address_hi = 0;
     ex_segment_addr_mode = false;
+    crypt_mode = false;
 }
 
 void ihex_set_callback_func(ihex_callback_fp fp)
 {
     callback_fp = fp;
+}
+
+bool ihex_is_crypt_mode()
+{
+    return crypt_mode;
 }
 
 bool ihex_parser(const uint8_t *steambuf, uint32_t size)
@@ -130,7 +153,7 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
             else if (c == ':')
             {
                 byte_count = 0;
-                record_type = 0;
+                record_type = RECORD_TYPE_DATA;
                 address_lo = 0x0000;
                 memset(data, 0, sizeof(data));
                 data_size_in_nibble = 0;
@@ -217,18 +240,18 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
                 return false;
             }
 
-            if (record_type == 2)           // Set extended segment addresss
+            if (record_type == RECORD_TYPE_EX_SEG_ADDR)           // Set extended segment addresss
             {
                 address_hi = ((uint16_t)data[0] << 8) | (data[1]);
                 ex_segment_addr_mode = true;
             }
-            else if (record_type == 4)      // Set linear addresss
+            else if (record_type == RECORD_TYPE_EX_LIN_ADDR)      // Set linear addresss
             {
                 address_hi = ((uint16_t)data[0] << 8) | (data[1]);
                 ex_segment_addr_mode = false;
             }
 
-            if (record_type == 0 && callback_fp != 0)
+            if (record_type == RECORD_TYPE_DATA && callback_fp != 0)
             {
                 uint32_t address = TRANSFORM_ADDR(address_hi, address_lo);
                 if(!callback_fp(address, data, data_size_in_nibble>>1))
@@ -236,8 +259,12 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
                     return false;
                 }
             }
+            else if(record_type == RECORD_TYPE_CRYPT_MODE)
+            {
+                crypt_mode = true;
+            }
 #if (CONFIG_SOFT_RESET_AFTER_IHEX_EOF > 0u)
-            else if(record_type == 1)
+            else if(record_type == RECORD_TYPE_EOF)
             {
                 NVIC_SystemReset();
             }

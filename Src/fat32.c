@@ -104,12 +104,6 @@ typedef __packed struct
 
 //-------------------------------------------------------
 
-typedef struct
-{
-    uint32_t begin;
-    uint32_t end;
-}fat32_range_t;
-
 typedef union
 {
   uint8_t buf[4];
@@ -119,8 +113,7 @@ typedef union
 //-------------------------------------------------------
 
 #define FAT32_DIR_ENTRY_ADDR         0x00400000
-
-static fat32_range_t fw_addr_range = {0x00400600, (0x00400600 + APP_SIZE)};
+#define FAT32_FIRMWARE_BIN_ADDR      0x00400600
 
 //-------------------------------------------------------
 
@@ -175,7 +168,7 @@ static void _fat32_read_bpb(uint8_t *b)
     //bpb->BS_Reserved1;
     bpb->BS_BootSig = 0x29;
     bpb->BS_VolID = 0x94B11E23;
-    memcpy(bpb->BS_VolLab, "NO NAME    ", 11);
+    memcpy(bpb->BS_VolLab, "BOOTLOADER ", 11);
     memcpy(bpb->BS_FilSysType, "FAT32   ", 8);
     
     b[510] = 0x55;
@@ -291,7 +284,7 @@ static void _fat32_read_dir_entry(uint8_t *b)
 static void _fat32_read_firmware(uint8_t *b, uint32_t addr)
 {
 #if (CONFIG_READ_FLASH > 0u)
-    uint32_t offset = addr - fw_addr_range.begin;
+    uint32_t offset = addr - FAT32_FIRMWARE_BIN_ADDR;
     uint32_t addr_end = MIN(offset + FAT32_SECTOR_SIZE, APP_SIZE);
     int32_t total_size = addr_end - offset;
     
@@ -308,6 +301,13 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint8_t
     HAL_StatusTypeDef status;
     
     HAL_FLASH_Unlock();
+    
+#if (CONFIG_SUPPORT_CRYPT_MODE > 0u)
+    if(ihex_is_crypt_mode())
+    {
+      //
+    }
+#endif
     
     if(phy_addr == APP_ADDR)
     {
@@ -346,7 +346,7 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint8_t
             for(i=0; i<prog_size; i++)
             {
                 content.buf[i+unalign] = *buf++;
-                phy_addr++;
+                ++phy_addr;
                 --size;
             }
             HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, prog_addr, content.value32);
@@ -418,7 +418,7 @@ bool fat32_read(uint8_t *b, uint32_t addr)
     {
         _fat32_read_dir_entry(b);
     }
-    else if(addr >= fw_addr_range.begin && addr < fw_addr_range.end)
+    else if(addr >= FAT32_FIRMWARE_BIN_ADDR && addr < (FAT32_FIRMWARE_BIN_ADDR+APP_SIZE))
     {
         _fat32_read_firmware(b, addr);
     }
@@ -455,22 +455,17 @@ bool fat32_write(const uint8_t *b, uint32_t addr)
             {
                 ihex_reset_state();
                 
-                uint32_t clus = (((uint32_t)(entry->DIR_FstClusHI)) << 16) | entry->DIR_FstClusLO;
+                // uint32_t clus = (((uint32_t)(entry->DIR_FstClusHI)) << 16) | entry->DIR_FstClusLO;
               
-                fw_addr_range.begin = ((clus-2) + 0x2000 ) * FAT32_SECTOR_SIZE;
-                fw_addr_range.end = fw_addr_range.begin + entry->DIR_FileSize;       // don't know the size of HEX file
+                // fw_addr_range.begin = ((clus-2) + 0x2000 ) * FAT32_SECTOR_SIZE;
+                // fw_addr_range.end = fw_addr_range.begin + entry->DIR_FileSize;       // don't know the size of HEX file
             }
         }
     }
-    else if(addr >= fw_addr_range.begin)
-    {
-        ihex_set_callback_func(_fat32_write_firmware);
-        
-        ihex_parser(b, FAT32_SECTOR_SIZE);
-    }
     else
     {
-        volatile uint8_t halt = 1;
+        ihex_set_callback_func(_fat32_write_firmware);
+        ihex_parser(b, FAT32_SECTOR_SIZE);
     }
     
     return true;

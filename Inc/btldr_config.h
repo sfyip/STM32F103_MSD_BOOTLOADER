@@ -13,12 +13,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #ifndef _BTLDR_CONFIG_H_
 #define _BTLDR_CONFIG_H_
 
-// STM32F103C8T6 - 128KB Flash Size
-#define DEV_CODE_ADDR           0x08000000
+#include <stm32f1xx.h>
+
+// STM32F103C8T6 - 128KB Flash Size      
 #define DEV_FLASH_SIZE          (128*1024)
 
-#define APP_ADDR                (DEV_CODE_ADDR + 0x4000)
+#define APP_ADDR                (FLASH_BASE + 0x4000)
 #define APP_SIZE                (DEV_FLASH_SIZE - 0x4000)
+
+/* In general, CONFIG_READ_FLASH should be set to 0 if CONFIG_SUPPORT_CRYPT_MODE is 1 */
+#define CONFIG_SUPPORT_CRYPT_MODE           0u
 
 #define CONFIG_READ_FLASH                   1u
 #define CONFIG_SOFT_RESET_AFTER_IHEX_EOF    1u
