@@ -38,7 +38,7 @@ typedef vector<uint8_t> byte_array_t;
 static map<uint32_t, byte_array_t> mem_map;
 
 
-bool write_flash_data(uint32_t addr, const uint8_t *buf, uint8_t bufsize)
+bool save_flash_data(uint32_t addr, const uint8_t *buf, uint8_t bufsize)
 {
     byte_array_t byte_array(buf, buf + bufsize);
     mem_map.insert(pair < uint32_t, byte_array_t>(addr, byte_array));
@@ -58,7 +58,7 @@ bool write_flash_data(uint32_t addr, const uint8_t *buf, uint8_t bufsize)
 
 bool encrypt_file(const char *dest_filename, const char *src_filename)
 {
-    /* Open HEX file, read per 256 byte block size*/
+    /* Open HEX file, read per 512 byte block size */
     bool return_status = false;
     map<uint32_t, byte_array_t>::iterator iter;
     uint8_t *phy_mem = 0;
@@ -79,7 +79,7 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
         goto EXIT;
     }
 
-    ihex_set_callback_func(write_flash_data);
+    ihex_set_callback_func(save_flash_data);
 
     while ((readcount = fread(fbuf, 1, sizeof(fbuf), fp)) > 0)
     {
@@ -102,7 +102,7 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
     printf("Start address: %08X\n", start_addr);
     printf("Size: %08X\n", size);
 
-    if (size % AES_BLOCK_SIZE)
+    if (size & AES_BLOCK_SIZE)
     {
         size = (size & ~(AES_BLOCK_SIZE-1)) + AES_BLOCK_SIZE;
         printf("Size after align: %08X\n", size);
@@ -137,7 +137,7 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
     for(i=0; i<size; i+=AES_BLOCK_SIZE)
     {
         uint8_t enc_buf[AES_BLOCK_SIZE];
-        decrypt(enc_buf, &phy_mem[i], AES_BLOCK_SIZE, start_addr + i);
+        encrypt(enc_buf, &phy_mem[i], AES_BLOCK_SIZE, start_addr + i);
         memcpy(&phy_mem[i], enc_buf, AES_BLOCK_SIZE);
     }
 
