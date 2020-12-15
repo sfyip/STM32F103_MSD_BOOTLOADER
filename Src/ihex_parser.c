@@ -190,7 +190,7 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
             break;
 
         case RECORD_TYPE_1_STATE:
-            if (hc > 5)
+            if ( !(hc <= RECORD_TYPE_START_LIN_ADDR || hc == RECORD_TYPE_CRYPT_MODE) )
             {
                 return false;
             }
