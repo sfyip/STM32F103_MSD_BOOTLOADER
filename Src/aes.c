@@ -543,12 +543,17 @@ void AES_CBC_decrypt_buffer(struct AES_ctx* ctx, uint8_t* buf,  uint32_t length)
 
 void GenNewIV(uint8_t *iv)
 {
-  uint32_t bit = ((iv[0] >> 0) ^ (iv[1] >> 2) ^ (iv[2] >> 3) ^ (iv[2] >> 7) ^ (iv[3] >> 5)) & 1;
+    uint32_t iv32[AES_IVLEN>>2];
+    memcpy(iv32, iv, AES_IVLEN);
+
+    uint32_t bit = ((iv32[0] >> 0) ^ (iv32[1] >> 2) ^ (iv32[2] >> 3) ^ (iv32[2] >> 7) ^ (iv32[3] >> 5)) & 1;
     
-  iv[0] = (iv[0] >> 1) | (iv[1] << 31);
-  iv[1] = (iv[1] >> 1) | (iv[2] << 31);
-  iv[2] = (iv[2] >> 1) | (iv[3] << 31);
-  iv[3] = (iv[3] >> 1) | (bit << 31);
+    iv32[0] = (iv32[0] >> 1) | (iv32[1] << 31);
+    iv32[1] = (iv32[1] >> 1) | (iv32[2] << 31);
+    iv32[2] = (iv32[2] >> 1) | (iv32[3] << 31);
+    iv32[3] = (iv32[3] >> 1) | (bit << 31);
+    
+    memcpy(iv, iv32, AES_IVLEN);
 }
 
 /* Symmetrical operation: same function for encrypting as for decrypting. Note any IV/nonce should never be reused with the same key */
