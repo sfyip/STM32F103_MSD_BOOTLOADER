@@ -22,7 +22,7 @@ Just drag and drop the intel hex file to update the appcode. The bootloader will
 During power up, the bootloader will check the content of 0x0800_4000 exists or not.
 Hold PA0 (Connect to GND) during power up can force to enter bootloader mode.
 
-#### Only tested on Windows 8 and MacOS Sierra<br />
+#### Only tested on Windows 8, MacOS Sierra and Ubuntu 18.04<br />
 
 Several examples are provided in "example-hex" folder to validate the bootloader feature.
 
