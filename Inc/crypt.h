@@ -14,9 +14,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #define _CRYPT_H_
 
 #include <stdint.h>
-#include "aes_ctr.h"
+#include "aes.h"
 
+void crypt_init(void);
+void crypt_encrypt(uint8_t *buf, uint32_t size, uint32_t addr);
+void crypt_decrypt(uint8_t *buf, uint32_t size, uint32_t addr);
 
-void decrypt(uint8_t *outbuf,  const uint8_t *inbuf, uint32_t size, uint32_t addr);
 
 #endif

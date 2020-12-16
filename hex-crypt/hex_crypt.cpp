@@ -37,7 +37,6 @@ using namespace std;
 typedef vector<uint8_t> byte_array_t;
 static map<uint32_t, byte_array_t> mem_map;
 
-
 bool save_flash_data(uint32_t addr, const uint8_t *buf, uint8_t bufsize)
 {
     byte_array_t byte_array(buf, buf + bufsize);
@@ -60,17 +59,17 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
 {
     /* Open HEX file, read per 512 byte block size */
     bool return_status = false;
+    
     map<uint32_t, byte_array_t>::iterator iter;
     uint8_t *phy_mem = 0;
-
-    size_t readcount = 0;
-    uint32_t i, j;
-    uint8_t cs;
-
-    uint8_t fbuf[512];
-    
     uint32_t start_addr;
     uint32_t size;
+    
+    uint8_t fbuf[512];
+    size_t readcount = 0;
+    
+    uint32_t i, j;
+    uint8_t cs;
     
     FILE *fp = fopen(src_filename, "r");
     if (fp == NULL)
@@ -102,9 +101,9 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
     printf("Start address: %08X\n", start_addr);
     printf("Size: %08X\n", size);
 
-    if (size & AES_BLOCK_SIZE)
+    if (size & AES_BLOCKLEN)
     {
-        size = (size & ~(AES_BLOCK_SIZE-1)) + AES_BLOCK_SIZE;
+        size = (size & ~(AES_BLOCKLEN-1)) + AES_BLOCKLEN;
         printf("Size after align: %08X\n", size);
     }
 
@@ -133,12 +132,12 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
         }
     }
 #endif
-
-    for(i=0; i<size; i+=AES_BLOCK_SIZE)
+    
+    crypt_init();
+    
+    for(i=0; i<size; i+=AES_BLOCKLEN)
     {
-        uint8_t enc_buf[AES_BLOCK_SIZE];
-        encrypt(enc_buf, &phy_mem[i], AES_BLOCK_SIZE, start_addr + i);
-        memcpy(&phy_mem[i], enc_buf, AES_BLOCK_SIZE);
+        crypt_encrypt(&phy_mem[i], AES_BLOCKLEN, start_addr + i);
     }
 
 #if (CONFIG_DEBUG_OUTPUT > 0u)
@@ -193,9 +192,11 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
     return_status = true;
 
 EXIT:
+    mem_map.clear();
+    
     if (fp)
         fclose(fp);
-
+    
     if(phy_mem)
         free(phy_mem);
     
@@ -205,29 +206,33 @@ EXIT:
 bool test_crypt()
 {
     // Test crypt function
-    uint8_t plaintext[16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
-    uint8_t cipherbuf[16];
-    uint8_t dec_plaintext[16];
+    uint8_t plaintext[AES_BLOCKLEN] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
+    uint8_t cipherbuf[AES_BLOCKLEN];
+    uint8_t chk_plaintext[AES_BLOCKLEN];
     uint8_t i;
-
+    
+    crypt_init();
+    
     printf("=== Test crypt function\n");
-    encrypt(cipherbuf, plaintext, 16, 0x08000000);
+    memcpy(cipherbuf, plaintext, AES_BLOCKLEN);
+    crypt_encrypt(cipherbuf, AES_BLOCKLEN, 0x08000000);
     printf("Ciphertext result:");
-    for (i = 0; i < 16; i++)
+    for (i = 0; i < AES_BLOCKLEN; i++)
     {
         printf("%02X", cipherbuf[i]);
     }
     printf("\n");
 
-    decrypt(dec_plaintext, cipherbuf, 16, 0x08000000);
+    memcpy(chk_plaintext, cipherbuf, AES_BLOCKLEN);
+    crypt_decrypt(chk_plaintext, AES_BLOCKLEN, 0x08000000);
     printf("Plaintext result:");
-    for (i = 0; i < 16; i++)
+    for (i = 0; i < AES_BLOCKLEN; i++)
     {
-        printf("%02X", dec_plaintext[i]);
+        printf("%02X", chk_plaintext[i]);
     }
     printf("\n");
 
-    if (memcmp(dec_plaintext, plaintext, 16) != 0)
+    if (memcmp(chk_plaintext, plaintext, AES_BLOCKLEN) != 0)
     {
         printf("Decrypt result does not match\n");
         return false;

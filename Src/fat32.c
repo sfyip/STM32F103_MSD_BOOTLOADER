@@ -304,21 +304,15 @@ static bool _fat32_write_firmware(uint32_t phy_addr, const uint8_t *buf, uint8_t
     HAL_FLASH_Unlock();
     
 #if (CONFIG_SUPPORT_CRYPT_MODE > 0u)
-    uint8_t decrypt_buf[AES_BLOCK_SIZE];
-  
+    
     if(ihex_is_crypt_mode())
     {
-      if(size != AES_BLOCK_SIZE)
+      if(size != AES_BLOCKLEN)
       {
           return false;
       }
       
-      uint8_t i;
-      for(i=0; i<size; i+= AES_BLOCK_SIZE)
-      {
-          decrypt(decrypt_buf, buf, size, phy_addr);
-          buf = decrypt_buf;
-      }
+      crypt_decrypt((uint8_t*)buf, size, phy_addr);
     }
 #endif
     
@@ -398,7 +392,6 @@ EXIT:
     HAL_FLASH_Lock();
     return return_status;
 }
-
 
 //-------------------------------------------------------
 

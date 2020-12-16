@@ -1,16 +1,16 @@
 #include "crypt.h"
-#include "aes_ctr.h"
+#include "aes.h"
 
 
-static const uint8_t AES_INIT_IV[AES_IV_SIZE] =    {0x84, 0x5E, 0xF4, 0x23, 0x36, 0x83, 0x40, 0x8E, 0x83, 0x22, 0x74, 0xCF, 0xF1, 0xF0, 0x07, 0xCC};
-static const uint8_t AES_KEY[AES_KEY_SIZE]    =    {0x29, 0x76, 0xDE, 0xF0, 0x2A, 0xF4, 0x4E, 0xD7, 0xBE, 0x87, 0x1E, 0xA9, 0xDA, 0xB2, 0x5B, 0x24, \
-                                                    0x3A, 0xCA, 0x66, 0x38, 0xA7, 0xF6, 0x44, 0x45, 0xB1, 0x2C, 0x5E, 0x86, 0xCB, 0x73, 0xBA, 0x2F};
+static const uint8_t AES_INIT_IV[AES_IVLEN]    =    {0x84, 0x5E, 0xF4, 0x23, 0x36, 0x83, 0x40, 0x8E, 0x83, 0x22, 0x74, 0xCF, 0xF1, 0xF0, 0x07, 0xCC};
+static const uint8_t AES_KEY[AES_KEYLEN]       =    {0x29, 0x76, 0xDE, 0xF0, 0x2A, 0xF4, 0x4E, 0xD7, 0xBE, 0x87, 0x1E, 0xA9, 0xDA, 0xB2, 0x5B, 0x24, \
+                                                     0x3A, 0xCA, 0x66, 0x38, 0xA7, 0xF6, 0x44, 0x45, 0xB1, 0x2C, 0x5E, 0x86, 0xCB, 0x73, 0xBA, 0x2F};
 
 static void gen_iv_by_lfsr(uint8_t *iv, uint32_t addr)
 {
     uint8_t i;
   
-    for(i=0; i<AES_BLOCK_SIZE; i+=4)
+    for(i=0; i<AES_BLOCKLEN; i+=4)
     {
       iv[i]   = (addr         & 0xff) ^ AES_INIT_IV[i];
       iv[i+1] = ((addr >>  8) & 0xff) ^ AES_INIT_IV[i+1];
@@ -32,9 +32,24 @@ static void gen_iv_by_lfsr(uint8_t *iv, uint32_t addr)
     };
 }
 
-void decrypt(uint8_t *outbuf,  const uint8_t *inbuf, uint32_t size, uint32_t addr)
+static struct AES_ctx ctx;
+
+void crypt_init()
 {
-    uint8_t new_iv[AES_IV_SIZE];
+    AES_init_ctx(&ctx, AES_KEY);
+}
+
+inline void crypt_encrypt(uint8_t *buf, uint32_t size, uint32_t addr)
+{
+    // AES CTR is used, hence encrypt = decrypt
+    crypt_decrypt(buf, size, addr);
+}
+
+void crypt_decrypt(uint8_t *buf, uint32_t size, uint32_t addr)
+{
+    uint8_t new_iv[AES_IVLEN];
     gen_iv_by_lfsr(new_iv, addr);
-    aes_ctr_crypt_buffer(outbuf, inbuf, size, AES_KEY, new_iv);
+    
+    AES_ctx_set_iv(&ctx, new_iv);
+    AES_CTR_xcrypt_buffer(&ctx, buf, size);
 }

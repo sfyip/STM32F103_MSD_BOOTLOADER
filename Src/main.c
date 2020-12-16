@@ -39,6 +39,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <stdint.h>
 #include <stdbool.h>
 #include "btldr_config.h"
+#include "crypt.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -141,6 +142,9 @@ int main(void)
 
   if(!is_appcode_exist() || is_button_down())
   {
+#if(CONFIG_SUPPORT_CRYPT_MODE > 0u)
+    crypt_init();
+#endif
     MX_USB_DEVICE_Init();
     while(1)
     {
