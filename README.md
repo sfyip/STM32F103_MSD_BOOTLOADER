@@ -7,8 +7,8 @@ My example:
 | Name | Address |
 | --- | --- |
 | Appcode starts from: | 0x0800_4000 - 0x0801_FFFF  (112KB) |
-| (Unused) starts from: | 0x0800_3220 - 0x0800_3FFF (3.47KB)|
-| Bootloader starts from: | 0x0800_0000 - 0x0800_321F (12.53KB)|
+| (Unused) starts from: | 0x0800_3660 - 0x0800_3FFF (2.41KB)|
+| Bootloader starts from: | 0x0800_0000 - 0x0800_365F (13.59KB)|
 
 Simulate a USB removable disk (FAT32).
 The content of firmware.bin is mapped to Appcode area. Hence, the size of firmware.bin is also 112KB.
