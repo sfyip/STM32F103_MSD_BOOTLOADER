@@ -15,8 +15,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 #include <stm32f1xx.h>
 
-// STM32F103C8T6 - 128KB Flash Size      
-#define DEV_FLASH_SIZE          (128*1024)
+// STM32F103C8T6 - 64KB Flash Size      
+#define DEV_FLASH_SIZE          (64*1024)
+
+// STM32F103CBT6 - 128KB Flash Size    
+//#define DEV_FLASH_SIZE          (128*1024)
+
 
 #define APP_ADDR                (FLASH_BASE + 0x4000)
 #define APP_SIZE                (DEV_FLASH_SIZE - 0x4000)

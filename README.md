@@ -1,7 +1,7 @@
 # STM32F103_MSD_BOOTLOADER
 STM32F103 Mass Storage Device Bootloader
 
-Device: STM32F103C8T6 (Flash size: 128KB )
+Device: STM32F103C8T6 (Flash size: 64KB) / STM32F103CBT6 (Flash size: 128KB)
 
 My example:
 | Name | Address |
