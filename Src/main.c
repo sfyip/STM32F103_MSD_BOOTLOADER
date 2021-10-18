@@ -40,6 +40,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <stdbool.h>
 #include "btldr_config.h"
 #include "crypt.h"
+#include "ihex_parser.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -106,6 +107,15 @@ bool is_button_down()
     return (!LL_GPIO_IsInputPinSet(BTLDR_EN_GPIO_Port, BTLDR_EN_Pin) );
 }
 
+extern PCD_HandleTypeDef hpcd_USB_FS;
+
+void SystemReset(){
+    HAL_Delay(500);
+    HAL_PCD_DeInit(&hpcd_USB_FS);
+    HAL_Delay(1000);
+    NVIC_SystemReset();
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -148,6 +158,11 @@ int main(void)
     MX_USB_DEVICE_Init();
     while(1)
     {
+#if (CONFIG_SOFT_RESET_AFTER_IHEX_EOF > 0u)
+      if(ihex_is_eof()) {
+         SystemReset();
+      }
+#endif
     }
   }
   else

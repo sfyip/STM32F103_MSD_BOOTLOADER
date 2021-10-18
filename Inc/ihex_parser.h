@@ -29,5 +29,6 @@ void ihex_reset_state(void);                        // reset state machines, cal
 bool ihex_parser(const uint8_t *steambuf, uint32_t size);
 void ihex_set_callback_func(ihex_callback_fp fp);   // Callback function will be triggered at the end of recordtype 'Data'
 bool ihex_is_crypt_mode(void);                      // extend the ihex record type, if RECORD_TYPE_CRYPT_MODE (0x0E) is found, return true
+bool ihex_is_eof(void);
 
 #endif

@@ -81,6 +81,7 @@ static bool calc_cs_toogle = false;
 
 static ihex_callback_fp callback_fp = 0;
 static bool crypt_mode = false;     // extend the intex hex file format to support encryption
+static bool ihex_eof_trig = false;
 
 #define TRANSFORM_ADDR(addr_hi, addr_lo)       (ex_segment_addr_mode) ?                                  \
                                                 ( (((uint32_t)(addr_hi)) << 4) + ((uint32_t)(addr_lo)) ): \
@@ -94,6 +95,7 @@ void ihex_reset_state()
     address_hi = 0;
     ex_segment_addr_mode = false;
     crypt_mode = false;
+    ihex_eof_trig = false;
 }
 
 void ihex_set_callback_func(ihex_callback_fp fp)
@@ -263,12 +265,10 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
             {
                 crypt_mode = true;
             }
-#if (CONFIG_SOFT_RESET_AFTER_IHEX_EOF > 0u)
             else if(record_type == RECORD_TYPE_EOF)
             {
-                NVIC_SystemReset();
+                ihex_eof_trig = true;
             }
-#endif
 
             state = START_CODE_STATE;
             break;
@@ -280,4 +280,7 @@ bool ihex_parser(const uint8_t *steambuf, uint32_t size)
     return true;
 }
 
+bool ihex_is_eof() {
+    return ihex_eof_trig;
+}
 
