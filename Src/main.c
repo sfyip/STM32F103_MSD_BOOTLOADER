@@ -110,9 +110,9 @@ bool is_button_down()
 extern PCD_HandleTypeDef hpcd_USB_FS;
 
 void SystemReset(){
-    HAL_Delay(500);
-    HAL_PCD_DeInit(&hpcd_USB_FS);
-    HAL_Delay(1000);
+    LL_mDelay(500);
+    HAL_PCD_Stop(&hpcd_USB_FS);
+    LL_mDelay(1000);
     NVIC_SystemReset();
 }
 
