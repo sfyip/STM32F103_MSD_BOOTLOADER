@@ -90,18 +90,6 @@ bool is_appcode_exist()
   }
 }
 
-void jmp_to_appcode()
-{
-  /* Function pointer to the address of the user application. */
-  uint32_t jump_addr = *((__IO uint32_t*)(APP_ADDR+4u));
-  HAL_DeInit();
-  /* Change the main stack pointer. */
-  __set_MSP(*(__IO uint32_t*)APP_ADDR);
-  SCB->VTOR = APP_ADDR;
-  
-  ((void (*) (void)) (jump_addr)) ();
-}
-
 bool is_button_down()
 {
     return (!LL_GPIO_IsInputPinSet(BTLDR_EN_GPIO_Port, BTLDR_EN_Pin) );
@@ -122,6 +110,9 @@ void SystemReset(){
   * @brief  The application entry point.
   * @retval int
   */
+  
+static uint32_t jump_addr;
+  
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -167,7 +158,25 @@ int main(void)
   }
   else
   {
-    jmp_to_appcode();
+    // Jump to the app code
+	jump_addr = *((__IO uint32_t*)(APP_ADDR+4u));
+	HAL_DeInit();
+	__disable_irq();
+
+	// Disable all interrupts
+	NVIC->ICER[0] = 0xFFFFFFFF;
+	NVIC->ICER[1] = 0xFFFFFFFF;
+	NVIC->ICER[2] = 0xFFFFFFFF;
+
+	NVIC->ICPR[0] = 0xFFFFFFFF;
+	NVIC->ICPR[1] = 0xFFFFFFFF;
+	NVIC->ICPR[2] = 0xFFFFFFFF;
+
+	/* Change the main stack pointer. */
+	SCB->VTOR = APP_ADDR;
+	__set_MSP((*(__IO uint32_t*)APP_ADDR));
+
+	((void (*) (void)) (jump_addr)) ();
   }
 
   /* USER CODE END 2 */
