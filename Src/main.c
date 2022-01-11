@@ -99,8 +99,17 @@ extern PCD_HandleTypeDef hpcd_USB_FS;
 
 void SystemReset(){
     LL_mDelay(500);
+
     HAL_PCD_Stop(&hpcd_USB_FS);
+
+    /* Pull USB D+ PIN to GND so USB Host detects device disconnect */
+    LL_GPIO_SetPinMode(GPIOA,LL_GPIO_PIN_12, LL_GPIO_MODE_OUTPUT);
+    LL_GPIO_SetPinSpeed(GPIOA, LL_GPIO_PIN_12, LL_GPIO_SPEED_FREQ_LOW);
+    LL_GPIO_SetPinOutputType(GPIOA,LL_GPIO_PIN_12, LL_GPIO_OUTPUT_PUSHPULL);
+    LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_12);
+
     LL_mDelay(1000);
+
     NVIC_SystemReset();
 }
 
