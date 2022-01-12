@@ -42,7 +42,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 //-------------------------------------------------------
 
-typedef __packed struct 
+typedef struct
 {
     uint8_t BS_jmpBoot[3];
     uint8_t BS_OEMName[8];
@@ -73,9 +73,9 @@ typedef __packed struct
     uint32_t BS_VolID;
     uint8_t BS_VolLab[11];
     uint8_t BS_FilSysType[8];
-}fat32_bpb_t;
+}__attribute__((packed)) fat32_bpb_t  ;
 
-typedef __packed struct 
+typedef struct
 {
     uint32_t FSI_LeadSig;
     uint8_t FSI_Reserved1[480];
@@ -84,9 +84,9 @@ typedef __packed struct
     uint32_t FSI_Nxt_Free;
     uint8_t FSI_Reserved2[12];
     uint32_t FSI_TrailSig;
-}fat32_fsinfo_t;
+}__attribute__((packed)) fat32_fsinfo_t  ;
 
-typedef __packed struct 
+typedef struct
 {
     uint8_t DIR_Name[11];
     uint8_t DIR_Attr;
@@ -101,7 +101,7 @@ typedef __packed struct
     uint16_t DIR_WrtDate;
     uint16_t DIR_FstClusLO;
     uint32_t DIR_FileSize;
-}fat32_dir_entry_t;
+}__attribute__((packed)) fat32_dir_entry_t  ;
 
 //-------------------------------------------------------
 
