@@ -68,7 +68,13 @@
 #define STORAGE_BLK_SIZ                  0x200
 
 /* USER CODE BEGIN PRIVATE_DEFINES */
+#if (STORAGE_BLK_NBR != 0x3C000)
+	#error "Please change STORAGE_BLK_NBR to 0x3C000"
+#endif
 
+#if (STORAGE_BLK_SIZ != 0x200)
+	#error "Please change STORAGE_BLK_SIZ to 0x200"
+#endif
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
