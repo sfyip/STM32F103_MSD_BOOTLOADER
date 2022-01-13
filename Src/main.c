@@ -41,6 +41,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "btldr_config.h"
 #include "crypt.h"
 #include "ihex_parser.h"
+#include "crc.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -50,7 +52,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -73,6 +74,7 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#if (BTLDR_ACT_NoAppExist > 0u)
 bool is_appcode_exist()
 {
   uint32_t *mem = (uint32_t*)APP_ADDR;
@@ -89,13 +91,29 @@ bool is_appcode_exist()
     return true;
   }
 }
+#endif
 
+#if (BTLDR_ACT_CksNotVld > 0u)
+bool app_cks_valid()
+{
+	unsigned long app_crc32 = 0;
+
+	/* calculate CRC32 checksum from start of main application until CRC32 location */
+	app_crc32 = crc32_calculate((const unsigned char *)APP_ADDR, (CRC_ADDR-APP_ADDR));
+
+	/* compare self calculated CRC32 with CRC32 stored in flash */
+	return (app_crc32 == *((uint32_t*)(CRC_ADDR)));
+}
+#endif
+
+#if (BTLDR_ACT_ButtonPress > 0u)
 bool is_button_down()
 {
     return (!LL_GPIO_IsInputPinSet(BTLDR_EN_GPIO_Port, BTLDR_EN_Pin) );
 }
 
 extern PCD_HandleTypeDef hpcd_USB_FS;
+#endif
 
 void SystemReset(){
     LL_mDelay(500);
@@ -150,7 +168,17 @@ int main(void)
   
   /* USER CODE BEGIN 2 */
 
-  if(!is_appcode_exist() || is_button_down())
+ if(	/* Check for configured activation options */
+		#if (BTLDR_ACT_NoAppExist > 0u)
+			 !is_appcode_exist()
+		#endif
+		#if (BTLDR_ACT_ButtonPress > 0u)
+			|| is_button_down()
+		#endif
+		#if (BTLDR_ACT_CksNotVld > 0u)
+			|| !app_cks_valid()
+		#endif
+	 )
   {
 #if(CONFIG_SUPPORT_CRYPT_MODE > 0u)
     crypt_init();
@@ -170,7 +198,6 @@ int main(void)
     // Jump to the app code
 	jump_addr = *((__IO uint32_t*)(APP_ADDR+4u));
 	HAL_DeInit();
-	__disable_irq();
 
 	// Disable all interrupts
 	NVIC->ICER[0] = 0xFFFFFFFF;
