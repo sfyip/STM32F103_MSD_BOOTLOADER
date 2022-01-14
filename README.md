@@ -40,4 +40,4 @@ For more detail, please see the tools/hex-crypt folder.
 #### Added CRC32 Checksum:
 1. In btldr_config.h, set BTLDR_ACT_CksNotVld to 1.
 2. Use Keli to build the project, the bootloader size should be under 16KB (STM32_MSD_BTLDR_CRC32.hex).
-3. Execute add_crc32.bat to generate the new hex file (CRC checksum at placed at last sector page).
+3. Execute tools/crc-calc/add_crc32.bat to generate new hex file (CRC checksum is placed at last 32bit block of Flash).
