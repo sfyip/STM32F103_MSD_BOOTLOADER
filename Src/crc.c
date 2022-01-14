@@ -4,13 +4,6 @@
 
 #define USE_CRC32_HW 1
 
-
-/***************************************
- * This part of the functionality uses STM32F1 CRC Hardware
- ***************************************/
-#if (USE_CRC32_HW > 0u)
-
-
 inline uint32_t swap_uint32(uint32_t value) 
 {
     return (((value & 0x000000FF) << 24) |
@@ -18,6 +11,12 @@ inline uint32_t swap_uint32(uint32_t value)
             ((value & 0x00FF0000) >>  8) |
             ((value & 0xFF000000) >> 24));
 }
+
+
+/***************************************
+ * This part of the functionality uses STM32F1 CRC Hardware
+ ***************************************/
+#if (USE_CRC32_HW > 0u)
 
 /*
  * Calculate CRC32 of memory region. This function uses STM32's CRC hardware.
