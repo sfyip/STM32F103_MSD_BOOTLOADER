@@ -35,4 +35,9 @@ Several examples are provided in "example-hex" folder to validate the bootloader
 6. The bootloader jumps to Appcode. LED (PC13) blinks. 
 
 #### Added AES256-CTR Encryption:
-For more detail, please see the hex-crypt folder.
+For more detail, please see the tools/hex-crypt folder.
+
+#### Added CRC32 Checksum:
+1. In btldr_config.h, set BTLDR_ACT_CksNotVld to 1.
+2. Use Keli to build the project, the bootloader size should be under 16KB (STM32_MSD_BTLDR_CRC32.hex).
+3. Execute add_crc32.bat to generate the new hex file (CRC checksum at placed at last sector page).
