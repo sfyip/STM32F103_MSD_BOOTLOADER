@@ -16,16 +16,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include <stm32f1xx.h>
 
 // STM32F103C8T6 - 64KB Flash Size      
-//#define DEV_FLASH_SIZE          			(64*1024)
+//#define DEV_FLASH_SIZE                    (64*1024)
 
 // STM32F103CBT6 - 128KB Flash Size    
-#define DEV_FLASH_SIZE          			(128*1024)
+#define DEV_FLASH_SIZE                      (128*1024)
 
 
-#define APP_OFFSET							0x4800
-#define APP_ADDR                			(FLASH_BASE + APP_OFFSET)
-#define APP_SIZE                			(DEV_FLASH_SIZE - APP_OFFSET)
-#define CRC_ADDR							FLASH_BASE + DEV_FLASH_SIZE - 4	//Last 32bit block of Flash
+#define APP_OFFSET                          0x4000
+#define APP_ADDR                            (FLASH_BASE + APP_OFFSET)
+#define APP_SIZE                            (DEV_FLASH_SIZE - APP_OFFSET)
+#define CRC_ADDR                            FLASH_BASE + DEV_FLASH_SIZE - 4	//Last 32bit block of Flash
 
 /* In general, CONFIG_READ_FLASH should be set to 0 if CONFIG_SUPPORT_CRYPT_MODE is 1 */
 #define CONFIG_SUPPORT_CRYPT_MODE           1u
@@ -34,9 +34,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #define CONFIG_SOFT_RESET_AFTER_IHEX_EOF    1u
 
 /* Options for Bootloader Activation */
-#define BTLDR_ACT_ButtonPress				1u
-#define BTLDR_ACT_NoAppExist				1u
-#define BTLDR_ACT_CksNotVld					1u
-
+#define BTLDR_ACT_ButtonPress               1u
+#define BTLDR_ACT_NoAppExist                1u
+#define BTLDR_ACT_CksNotVld                 0u
 
 #endif

@@ -97,10 +97,10 @@ bool is_appcode_exist()
 #if (BTLDR_ACT_CksNotVld > 0u)
 bool app_cks_valid()
 {
-	unsigned long app_crc32 = 0;
+	uint32_t app_crc32 = 0;
 
 	/* calculate CRC32 checksum from start of main application until CRC32 location */
-	app_crc32 = crc32_calculate((const unsigned char *)APP_ADDR, (CRC_ADDR-APP_ADDR));
+	app_crc32 = crc32_calculate((const uint8_t *)APP_ADDR, (CRC_ADDR-APP_ADDR));
 
 	/* compare self calculated CRC32 with CRC32 stored in flash */
 	return (app_crc32 == *((uint32_t*)(CRC_ADDR)));
@@ -112,9 +112,9 @@ bool is_button_down()
 {
     return (!LL_GPIO_IsInputPinSet(BTLDR_EN_GPIO_Port, BTLDR_EN_Pin) );
 }
+#endif
 
 extern PCD_HandleTypeDef hpcd_USB_FS;
-#endif
 
 void SystemReset(){
     LL_mDelay(500);

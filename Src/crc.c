@@ -8,38 +8,27 @@
 /***************************************
  * This part of the functionality uses STM32F1 CRC Hardware
  ***************************************/
-#if USE_CRC32_HW == 1
+#if (USE_CRC32_HW > 0u)
 
-/*
- * Revert byte order within an amount of bytes
- */
-void revert_bytes(uint8_t *Data, uint8_t length)
+
+inline uint32_t swap_uint32(uint32_t value) 
 {
-	uint8_t copy[length];
-
-	// save original data
-	for(uint32_t i=0; i<length; i++)
-	{
-			copy[i] = Data[i];
-	}
-
-	for(uint32_t i=0; i<length; i++)
-	{
-		Data[length-i-1] = copy[i];
-	}
+    return (((value & 0x000000FF) << 24) |
+            ((value & 0x0000FF00) <<  8) |
+            ((value & 0x00FF0000) >>  8) |
+            ((value & 0xFF000000) >> 24));
 }
-
 
 /*
  * Calculate CRC32 of memory region. This function uses STM32's CRC hardware.
  */
-unsigned long crc32_calculate(const unsigned char *data, size_t len)
+uint32_t crc32_calculate(const uint8_t *data, size_t len)
 {
   uint32_t i, j;
 	
 	union cks {
 		uint8_t crc_array[4];		  // crc32
-		unsigned long ui32;
+		uint32_t ui32;
 	};
   union cks temp;
 	
@@ -83,9 +72,7 @@ unsigned long crc32_calculate(const unsigned char *data, size_t len)
 
 	LL_AHB1_GRP1_DisableClock(LL_AHB1_GRP1_PERIPH_CRC);
 	
-	revert_bytes(temp.crc_array,sizeof(temp.crc_array));
-	
-  return temp.ui32; //now the output is compatible with windows/winzip/winrar
+  return swap_uint32(temp.ui32); //now the output is compatible with windows/winzip/winrar
 };
 
 
@@ -94,7 +81,7 @@ unsigned long crc32_calculate(const unsigned char *data, size_t len)
  ***************************************/
 #else
 
-const unsigned long crc32_tab[] = {
+const uint32_t crc32_tab[] = {
 	0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
 	0xe963a535, 0x9e6495a3,	0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
 	0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2,
@@ -146,7 +133,7 @@ const unsigned long crc32_tab[] = {
  * Calculate CRC32 of memory region. This function variant works without
  * availability of a hardware CRC unit.
  */
-unsigned long crc32_calculate(const unsigned char *data, size_t len)
+uint32_t crc32_calculate(const uint8_t *data, size_t len)
 {
 	union cks {
 		uint8_t crc_array[4];		  // crc32
@@ -154,7 +141,7 @@ unsigned long crc32_calculate(const unsigned char *data, size_t len)
 	};
 	
 	union cks temp;
-	const unsigned char *ptr;
+	const uint8_t *ptr;
 	size_t i;
 
 	temp.crc = 0xFFFFFFFFul;
@@ -166,9 +153,7 @@ unsigned long crc32_calculate(const unsigned char *data, size_t len)
 		}
 	}
 	
-	revert_bytes(temp.crc_array,sizeof(temp.crc_array));
-	
-	return (temp.crc ^ 0xFFFFFFFFul);
+	return swap_uint32(temp.crc ^ 0xFFFFFFFFul);
 
 }
 
