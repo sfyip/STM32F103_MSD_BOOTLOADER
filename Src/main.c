@@ -76,7 +76,7 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 #if (BTLDR_ACT_NoAppExist > 0u)
-bool is_appcode_exist()
+bool is_appcode_exist(void)
 {
   uint32_t *mem = (uint32_t*)APP_ADDR;
   
@@ -95,7 +95,7 @@ bool is_appcode_exist()
 #endif
 
 #if (BTLDR_ACT_CksNotVld > 0u)
-bool app_cks_valid()
+bool app_cks_valid(void)
 {
 	uint32_t app_crc32 = 0;
 
@@ -108,15 +108,24 @@ bool app_cks_valid()
 #endif
 
 #if (BTLDR_ACT_ButtonPress > 0u)
-bool is_button_down()
+bool is_button_down(void)
 {
     return (!LL_GPIO_IsInputPinSet(BTLDR_EN_GPIO_Port, BTLDR_EN_Pin) );
 }
 #endif
 
+#if (BTLDR_ACT_BootkeyDet > 0u)
+
+volatile __attribute__((section("._bootkey_section.btldr_act_req_key"))) uint32_t btldr_act_req_key;
+
+bool bootkey_detected(void){
+	return(btldr_act_req_key == BOOTKEY);
+}
+#endif
+
 extern PCD_HandleTypeDef hpcd_USB_FS;
 
-void SystemReset(){
+void SystemReset(void){
     LL_mDelay(500);
 
     HAL_PCD_Stop(&hpcd_USB_FS);
@@ -178,6 +187,9 @@ int main(void)
 		#endif
 		#if (BTLDR_ACT_CksNotVld > 0u)
 			|| !app_cks_valid()
+		#endif
+		#if (BTLDR_ACT_BootkeyDet > 0u)
+			|| bootkey_detected()
 		#endif
 	 )
   {
