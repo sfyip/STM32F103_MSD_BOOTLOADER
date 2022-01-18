@@ -53,7 +53,7 @@ Before bootloader jumps to main application, it calculates the app's CRC32 check
 
 #### Enable Bootloader from Application
 It is possible to activate the bootloader from a running main application. Following modifications are required:
-1. Add a new section for the bootloader activation request key to the end of RAM (Address 0x20004FFC, Size 4, Noinit). For Keil linker you can take the scatter file from this project as example
+1. Add a new section for the bootloader activation request key to the end of RAM (Address 0x20004FFC, Size 4). For Keil linker you can take the scatter file from this project as example
 2. In main application, declare a variable in the newly added RAM section:
 ```c
 volatile __attribute__((section("._bootkey_section.btldr_act_req_key"))) uint32_t btldr_act_req_key;
