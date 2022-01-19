@@ -4,7 +4,7 @@
 
 #define USE_CRC32_HW 1
 
-inline uint32_t swap_uint32(uint32_t value) 
+static inline uint32_t swap_uint32(uint32_t value)
 {
     return (((value & 0x000000FF) << 24) |
             ((value & 0x0000FF00) <<  8) |
