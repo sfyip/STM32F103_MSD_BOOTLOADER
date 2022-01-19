@@ -27,7 +27,7 @@ Hold PA0 (Connect to GND) during power up can force to enter bootloader mode.
 - [x] Windows 7
 - [x] MacOS Sierra
 - [x] Ubuntu 18.04
-- [ ] Windows 10
+- [x] Windows 10
 
 Several examples are provided in "example-hex" folder to validate the bootloader feature.
 
@@ -52,14 +52,18 @@ Before bootloader jumps to main application, it calculates the app's CRC32 check
 3. Execute tools/crc-calc/add_crc32.bat to generate new hex file (CRC checksum is placed at last 32bit block of Flash).
 
 #### Enable Bootloader from Application
-It is possible to activate the bootloader from a running main application. Following modifications are required:
-1. Add a new section for the bootloader activation request key to the end of RAM (Address 0x20004FFC, Size 4). For Keil linker you can take the scatter file from this project as example
-2. In main application, declare a variable in the newly added RAM section:
+It is possible to activate the bootloader from a running main application. 
+
 ```c
-volatile __attribute__((section("._bootkey_section.btldr_act_req_key"))) uint32_t btldr_act_req_key;
-```
-3. Add following line to the main application. This needs to be called if application receives "jump to bootloader" request:
-```c
-btldr_act_req_key == BOOTKEY  //same BOOTKEY as defined in Bootloader
+*((volatile uint32_t*)0x20004ffc) = BOOTKEY;	//same BOOTKEY as defined in Bootloader
+
+/* Pull USB D+ PIN to GND so USB Host detects device disconnect */
+LL_GPIO_SetPinMode(GPIOA,LL_GPIO_PIN_12, LL_GPIO_MODE_OUTPUT);
+LL_GPIO_SetPinSpeed(GPIOA, LL_GPIO_PIN_12, LL_GPIO_SPEED_FREQ_LOW);
+LL_GPIO_SetPinOutputType(GPIOA,LL_GPIO_PIN_12, LL_GPIO_OUTPUT_PUSHPULL);
+LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_12);
+
+LL_mDelay(1000);
+
 NVIC_SystemReset();
 ```

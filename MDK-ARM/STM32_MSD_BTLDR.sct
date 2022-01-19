@@ -12,9 +12,8 @@ LR_IROM1 0x08000000 0x00010000  {    ; load region size_region
   RW_IRAM1 0x20000000 0x00004FFC  {  ; RW data
    .ANY (+RW +ZI)
   }
-  BOOTKEY_RAM 0x20004FFC UNINIT 0x00000004  {
-   *(._bootkey_section.btldr_act_req)
-   
+  BOOTKEY_RAM 0x20004FFC UNINIT OVERLAY 0x00000004  {
+   *(._bootkey_section.btldr_act_req_key)
   }
 }
 

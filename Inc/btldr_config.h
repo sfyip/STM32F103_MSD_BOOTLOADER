@@ -37,9 +37,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #define BTLDR_ACT_ButtonPress               1u
 #define BTLDR_ACT_NoAppExist                1u
 #define BTLDR_ACT_CksNotVld                 0u
-#define BTLDR_ACT_BootkeyDet				1u
+#define BTLDR_ACT_BootkeyDet                1u
 
-#define BOOTKEY							0x12345678
+#define BOOTKEY                             0x12345678
 
 
 #endif

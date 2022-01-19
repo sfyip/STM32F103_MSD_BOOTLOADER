@@ -267,7 +267,7 @@ static void _fat32_read_dir_entry(uint8_t *b)
     
     ++dir;
     
-    memcpy(dir->DIR_Name, "FIRMWAREHEX", 11);
+    memcpy(dir->DIR_Name, "FIRMWAREBIN", 11);
     dir->DIR_Attr = FAT32_ATTR_ARCHIVE;
     dir->DIR_NTRes = 0x18;
     dir->DIR_CrtTimeTenth = 0x00;
