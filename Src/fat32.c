@@ -264,7 +264,8 @@ static void _fat32_read_dir_entry(uint8_t *b)
     dir->DIR_WrtDate = FAT32_MAKE_DATE(28,04,2020);
     dir->DIR_FstClusLO = 0x0000;
     dir->DIR_FileSize = 0x00000000;
-    
+
+#if (CONFIG_READ_FLASH > 0u)
     ++dir;
     
     memcpy(dir->DIR_Name, "FIRMWAREBIN", 11);
@@ -279,6 +280,7 @@ static void _fat32_read_dir_entry(uint8_t *b)
     dir->DIR_WrtDate = FAT32_MAKE_DATE(28,04,2020);
     dir->DIR_FstClusLO = 0x0005;
     dir->DIR_FileSize = APP_SIZE;
+#endif
 }
 
 // Addr : 0x0040_0600

@@ -11,7 +11,6 @@ My example:
 | Bootloader starts from: | 0x0800_0000 - 0x0800_36DF (13.72KB) | 0x0800_0000 - 0x0800_36DF (13.72KB)|
 
 Simulate a USB removable disk (FAT32).
-The content of firmware image defined in firmware.hex is mapped to appcode area. Hence, the maximum supported user application size (flash) is also 48KB / 112KB.
 
 Just drag and drop the intel hex file to update the appcode. The bootloader will automatically restart if EOF RecordType is found in the hex file.
 <b>Drag and drop the BIN file is removed.</b> Since intel hex file has the following advantages over the bin file:
@@ -48,7 +47,7 @@ For more detail, please see the tools/hex-crypt folder.
 #### CRC32 Checksum verification:
 Before bootloader jumps to main application, it calculates the app's CRC32 checksum and compares it to the CRC32 calculated at build time (which is stored at end of flash). Jump to app is only performed in case of valid checksum.
 1. In btldr_config.h, set BTLDR_ACT_CksNotVld to 1.
-2. Use Keli to build the project, the bootloader size should be under 16KB (STM32_MSD_BTLDR_CRC32.hex).
+2. Use Keil to build the project, the bootloader size should be under 16KB (STM32_MSD_BTLDR_CRC32.hex).
 3. Execute tools/crc-calc/add_crc32.bat to generate new hex file (CRC checksum is placed at last 32bit block of Flash).
 
 #### Enable Bootloader from Application
@@ -67,3 +66,6 @@ LL_mDelay(1000);
 
 NVIC_SystemReset();
 ```
+
+#### Read the appcode content in firmware.bin
+In btldr_config.h, set CONFIG_READ_FLASH to 1u to read the appcode content in firmware.bin. The content in firmware.bin is mapped to appcode area. Hence, the bin file size (flash) is also 48KB / 112KB.
