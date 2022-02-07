@@ -1,6 +1,5 @@
 #MicroXplorer Configuration settings - do not modify
 File.Version=6
-GPIO.groupedBy=Group By Peripherals
 KeepUserPlacement=false
 Mcu.Family=STM32F1
 Mcu.IP0=NVIC
@@ -85,7 +84,7 @@ ProjectManager.StackSize=0x400
 ProjectManager.TargetToolchain=MDK-ARM V5
 ProjectManager.ToolChainLocation=
 ProjectManager.UnderRoot=false
-ProjectManager.functionlistsort=1-MX_GPIO_Init-GPIO-false-LL-true,2-SystemClock_Config-RCC-false-LL-false,3-MX_USB_DEVICE_Init-USB_DEVICE-true-HAL-false
+ProjectManager.functionlistsort=1-MX_GPIO_Init-GPIO-false-LL-true,2-SystemClock_Config-RCC-false-LL-false,3-MX_USB_DEVICE_Init-USB_DEVICE-false-HAL-false
 RCC.ADCFreqValue=18000000
 RCC.AHBFreq_Value=72000000
 RCC.APB1CLKDivider=RCC_HCLK_DIV2
