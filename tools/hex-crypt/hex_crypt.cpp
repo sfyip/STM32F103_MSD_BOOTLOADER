@@ -63,6 +63,7 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
     map<uint32_t, byte_array_t>::iterator iter;
     uint8_t *phy_mem = 0;
     uint32_t start_addr;
+	uint32_t prev_addr;
     uint32_t size;
     
     uint8_t fbuf[512];
@@ -162,26 +163,37 @@ bool encrypt_file(const char *dest_filename, const char *src_filename)
 
     fprintf(fp, ":0000000EF2\n");       // 0E record type (self-defined record type), this file is encrypted
 
-    cs = 0x02;                          // generate checksum
-    cs += 0x04;
-    cs += (start_addr >> 24) & 0xff;
-    cs += (start_addr >> 16) & 0xff;
-    cs = ~cs + 1;
-    fprintf(fp, ":02000004%04X%02X\n", (start_addr >> 16) & 0xffff, cs);
+    prev_addr = 0;
 
     for (i = 0; i < size; i+=16)
     {
+        uint32_t cur_addr = start_addr + i;
+        if((prev_addr & 0xffff0000) != (cur_addr & 0xffff0000)) {
+            cs = 0x02;                     // generate checksum
+            cs += 0x04;
+            cs += (cur_addr >> 24) & 0xff;
+            cs += (cur_addr >> 16) & 0xff;
+            cs = ~cs + 1;
+
+            // Change page record type
+            fprintf(fp, ":02000004%04X%02X\n", (cur_addr >> 16) & 0xffff, cs);
+        }
+
         cs = 0x10;                      // generate checksum
-        cs += ((start_addr+i) >> 8) & 0xff;
-        cs += (start_addr+i) & 0xff;
+        cs += (cur_addr >> 8) & 0xff;
+        cs += cur_addr & 0xff;
         for (j = 0; j < 16; j++)
         {
             cs += phy_mem[i+j];
         }
         cs = ~cs + 1;
-        fprintf(fp, ":10%04X00%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\n", (start_addr+i) & 0xffff,     \
+
+        // Data record type
+        fprintf(fp, ":10%04X00%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X\n", cur_addr & 0xffff,     \
                     phy_mem[i], phy_mem[i+1], phy_mem[i+2], phy_mem[i+3], phy_mem[i+4], phy_mem[i+5], phy_mem[i+6], phy_mem[i+7],   \
                     phy_mem[i+8], phy_mem[i+9], phy_mem[i+10], phy_mem[i + 11], phy_mem[i + 12], phy_mem[i + 13], phy_mem[i + 14], phy_mem[i + 15], cs);
+
+        prev_addr = cur_addr;
     }
 
     fprintf(fp, ":00000001FF\n");       // EOF record type
