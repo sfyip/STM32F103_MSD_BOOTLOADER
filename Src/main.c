@@ -220,6 +220,9 @@ int main(void)
 	NVIC->ICPR[1] = 0xFFFFFFFF;
 	NVIC->ICPR[2] = 0xFFFFFFFF;
 
+	/* deactivate SysTick */
+	SysTick->CTRL = 0;
+
 	/* Change the main stack pointer. */
 	SCB->VTOR = APP_ADDR;
 	__set_MSP((*(__IO uint32_t*)APP_ADDR));
